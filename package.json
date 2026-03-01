@@ -1,0 +1,36 @@
+{
+    "name": "chrome-page-snapshot",
+    "version": "0.1.0",
+    "description": "Full page snapshot for Chrome extensions — scroll capture, region selection, annotation overlay, and PNG export for MV3.",
+    "author": "Zovo <hello@zovo.one>",
+    "license": "MIT",
+    "keywords": [
+        "chrome-extension",
+        "screenshot",
+        "snapshot",
+        "capture",
+        "page",
+        "png",
+        "manifest-v3",
+        "browser-extension"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/theluckystrike/chrome-page-snapshot.git"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "prepublishOnly": "npm run build"
+    },
+    "devDependencies": {
+        "@types/chrome": "^0.0.260",
+        "typescript": "^5.3.3"
+    }
+}
