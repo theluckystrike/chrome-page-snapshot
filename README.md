@@ -1,12 +1,73 @@
-# chrome-page-snapshot — Tab Screenshot Capture
-> **Built by [Zovo](https://zovo.one)** | `npm i chrome-page-snapshot`
+# chrome-page-snapshot
 
-Capture visible tab as PNG/JPEG, download, copy to clipboard, and save snapshot history.
+Capture full page snapshots as HTML or images in Chrome extensions.
 
-```typescript
-import { PageSnapshot } from 'chrome-page-snapshot';
-await PageSnapshot.captureAndDownload('screenshot.png');
-await PageSnapshot.captureToClipboard();
-await PageSnapshot.saveToStorage('snapshots');
+## Overview
+
+chrome-page-snapshot provides utilities to capture complete page snapshots, including lazy-loaded content, with HTML or screenshot options.
+
+## Installation
+
+```bash
+npm install chrome-page-snapshot
 ```
-MIT License
+
+## Usage
+
+### Capture HTML
+
+```javascript
+import { capturePage } from 'chrome-page-snapshot';
+
+const html = await capturePage.asHtml(tabId);
+console.log(html.length);
+```
+
+### Capture Screenshot
+
+```javascript
+const screenshot = await capturePage.asImage(tabId, {
+  format: 'png',
+  fullPage: true,
+});
+```
+
+### Capture as DataURL
+
+```javascript
+const dataUrl = await capturePage.asDataUrl(tabId);
+```
+
+## API
+
+### Methods
+
+- `asHtml(tabId)` - Get full page HTML
+- `asImage(tabId, options)` - Get screenshot
+- `asDataUrl(tabId)` - Get as data URL
+- `asBlob(tabId)` - Get as blob
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| format | string | 'png' | Image format |
+| quality | number | 92 | JPEG quality |
+| fullPage | boolean | false | Capture full scroll |
+| viewport | object | current | Viewport size |
+
+## Manifest
+
+```json
+{
+  "permissions": ["tabCapture"]
+}
+```
+
+## Browser Support
+
+- Chrome 90+
+
+## License
+
+MIT
