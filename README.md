@@ -4,8 +4,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![Chrome Web Extension](https://img.shields.io/badge/Chrome-Web%20Extension-orange.svg)](https://developer.chrome.com/docs/extensions/)
+[![CI Status](https://github.com/theluckystrike/chrome-page-snapshot/actions/workflows/ci.yml/badge.svg)](https://github.com/theluckystrike/chrome-page-snapshot/actions)
 [![Discord](https://img.shields.io/badge/Discord-Zovo-blueviolet.svg?logo=discord)](https://discord.gg/zovo)
 [![Website](https://img.shields.io/badge/Website-zovo.one-blue)](https://zovo.one)
+[![GitHub Stars](https://img.shields.io/github/stars/theluckystrike/chrome-page-snapshot?style=social)](https://github.com/theluckystrike/chrome-page-snapshot)
 
 > **Built by [Zovo](https://zovo.one)** — Screenshot capture for Chrome extensions
 
@@ -117,3 +119,7 @@ Visit [zovo.one](https://zovo.one) for more information.
 ## License
 
 MIT — [Zovo](https://zovo.one)
+
+---
+
+*Built by developers, for developers. No compromises on privacy.*
