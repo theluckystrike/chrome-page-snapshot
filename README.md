@@ -1,125 +1,124 @@
-# chrome-page-snapshot — Tab Screenshot Capture
+# chrome-page-snapshot
 
-[![npm version](https://img.shields.io/npm/v/chrome-page-snapshot)](https://npmjs.com/package/chrome-page-snapshot)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
-[![Chrome Web Extension](https://img.shields.io/badge/Chrome-Web%20Extension-orange.svg)](https://developer.chrome.com/docs/extensions/)
-[![CI Status](https://github.com/theluckystrike/chrome-page-snapshot/actions/workflows/ci.yml/badge.svg)](https://github.com/theluckystrike/chrome-page-snapshot/actions)
-[![Discord](https://img.shields.io/badge/Discord-Zovo-blueviolet.svg?logo=discord)](https://discord.gg/zovo)
-[![Website](https://img.shields.io/badge/Website-zovo.one-blue)](https://zovo.one)
-[![GitHub Stars](https://img.shields.io/github/stars/theluckystrike/chrome-page-snapshot?style=social)](https://github.com/theluckystrike/chrome-page-snapshot)
+Visible-tab screenshot capture for Chrome MV3 extensions. One static class, zero dependencies. Capture as PNG data URL, save to downloads, copy to clipboard, or persist snapshots in chrome.storage.
 
-> **Built by [Zovo](https://zovo.one)** — Screenshot capture for Chrome extensions
-
-Capture full page snapshots as HTML or images in Chrome extensions.
-
-Part of the [Zovo](https://zovo.one) family of Chrome extension utilities.
-
-## Overview
-
-chrome-page-snapshot provides utilities to capture complete page snapshots, including lazy-loaded content, with HTML or screenshot options.
-
-## Features
-
-- **HTML Capture**: Full page HTML snapshot
-- **Screenshot**: PNG/JPEG capture
-- **Full Page**: Scroll and capture entire page
-- **DataURL/Blob**: Multiple output formats
-- **TypeScript Support**: Full type definitions
-
-## Installation
+INSTALL
 
 ```bash
 npm install chrome-page-snapshot
 ```
 
-## Quick Start
+MANIFEST PERMISSIONS
 
-### Capture HTML
-
-```javascript
-import { capturePage } from 'chrome-page-snapshot';
-
-const html = await capturePage.asHtml(tabId);
-console.log(html.length);
-```
-
-### Capture Screenshot
-
-```javascript
-const screenshot = await capturePage.asImage(tabId, {
-  format: 'png',
-  fullPage: true,
-});
-```
-
-### Capture as DataURL
-
-```javascript
-const dataUrl = await capturePage.asDataUrl(tabId);
-```
-
-## API
-
-### Methods
-
-- `asHtml(tabId)` - Get full page HTML
-- `asImage(tabId, options)` - Get screenshot
-- `asDataUrl(tabId)` - Get as data URL
-- `asBlob(tabId)` - Get as blob
-
-### Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| format | string | 'png' | Image format |
-| quality | number | 92 | JPEG quality |
-| fullPage | boolean | false | Capture full scroll |
-| viewport | object | current | Viewport size |
-
-## Manifest
+Your extension manifest needs these permissions depending on which methods you use.
 
 ```json
 {
-  "permissions": ["tabCapture"]
+  "permissions": ["activeTab", "downloads", "storage"]
 }
 ```
 
-## Browser Support
+activeTab (or host permissions) is required for captureVisibleTab. downloads is only needed if you call captureAndDownload. storage is only needed if you call saveToStorage or getSaved.
 
-- Chrome 90+
-- Edge 90+
+USAGE
 
-## Contributing
+Import the PageSnapshot class and call its static methods from your service worker or extension page.
 
-Contributions are welcome! Please follow these steps:
+```ts
+import { PageSnapshot } from 'chrome-page-snapshot';
+```
 
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/snapshot-improvement`
-3. **Make** your changes
-4. **Test** your changes
-5. **Commit** your changes: `git commit -m 'Add new feature'`
-6. **Push** to the branch: `git push origin feature/snapshot-improvement`
-7. **Submit** a Pull Request
+Capture the visible tab as a PNG data URL.
 
-## See Also
+```ts
+const dataUrl = await PageSnapshot.captureVisible();
+```
 
-### Related Zovo Repositories
+You can pass a specific window ID if needed.
 
-- [chrome-extension-starter-mv3](https://github.com/theluckystrike/chrome-extension-starter-mv3) - Production-ready MV3 starter template
-- [chrome-page-info](https://github.com/theluckystrike/chrome-page-info) - Page data extraction
-- [chrome-screenshot-api](https://github.com/theluckystrike/chrome-screenshot-api) - Screenshot capture
+```ts
+const dataUrl = await PageSnapshot.captureVisible(windowId);
+```
 
-### Zovo Chrome Extensions
+Capture and immediately download as a PNG file.
 
-- [Zovo Tab Manager](https://chrome.google.com/webstore/detail/zovo-tab-manager) - Manage tabs efficiently
+```ts
+await PageSnapshot.captureAndDownload('my-screenshot.png');
+```
 
-Visit [zovo.one](https://zovo.one) for more information.
+When no filename is provided, it generates one from the current timestamp.
 
-## License
+```ts
+await PageSnapshot.captureAndDownload();
+// saves as snapshot_2025-01-15T10-30-00-000Z.png
+```
 
-MIT — [Zovo](https://zovo.one)
+Capture and copy the image to the system clipboard.
+
+```ts
+await PageSnapshot.captureToClipboard();
+```
+
+Capture as JPEG with a custom quality value (0 to 100, defaults to 80).
+
+```ts
+const jpegUrl = await PageSnapshot.captureJPEG(60);
+```
+
+Save a snapshot to chrome.storage.local under a key you choose. Each entry stores the data URL, a timestamp, and the page URL. The second argument caps how many snapshots to keep (defaults to 20, oldest dropped first).
+
+```ts
+await PageSnapshot.saveToStorage('my-snaps', 50);
+```
+
+Retrieve all saved snapshots for a given key. Returns an array of objects with url, timestamp, and page fields.
+
+```ts
+const snaps = await PageSnapshot.getSaved('my-snaps');
+snaps.forEach(s => {
+  console.log(s.timestamp, s.page, s.url.length);
+});
+```
+
+API REFERENCE
+
+PageSnapshot.captureVisible(windowId?: number): Promise<string>
+  Calls chrome.tabs.captureVisibleTab with PNG format at quality 100. Returns a data URL string. Falls back to the current window when no windowId is given.
+
+PageSnapshot.captureAndDownload(filename?: string): Promise<void>
+  Captures the visible tab and triggers a download via chrome.downloads.download. If filename is omitted, one is generated from the ISO timestamp.
+
+PageSnapshot.captureToClipboard(): Promise<void>
+  Captures the visible tab, converts the data URL to a Blob, and writes it to the clipboard as image/png using the Clipboard API.
+
+PageSnapshot.captureJPEG(quality?: number, windowId?: number): Promise<string>
+  Same as captureVisible but outputs JPEG. Quality defaults to 80.
+
+PageSnapshot.saveToStorage(key: string, maxSnapshots?: number): Promise<void>
+  Captures the visible tab and appends the result to an array in chrome.storage.local under the given key. Each entry is an object with url (data URL string), timestamp (epoch ms), and page (URL of the active tab). When the array exceeds maxSnapshots (default 20), the oldest entry is removed.
+
+PageSnapshot.getSaved(key: string): Promise<Array<{ url: string; timestamp: number; page: string }>>
+  Reads the snapshot array from chrome.storage.local for the given key. Returns an empty array if nothing is stored.
+
+BUILD FROM SOURCE
+
+```bash
+git clone https://github.com/theluckystrike/chrome-page-snapshot.git
+cd chrome-page-snapshot
+npm install
+npm run build
+```
+
+Output lands in dist/ as compiled JS with type declarations.
+
+BROWSER SUPPORT
+
+Chrome 90 and later. Edge 90 and later (Chromium-based).
+
+LICENSE
+
+MIT. See LICENSE file for details.
 
 ---
 
-Built by [Zovo](https://zovo.one)
+A zovo.one project. Visit https://zovo.one for more Chrome extension tools.
